@@ -1,0 +1,33 @@
+[gd_scene load_steps=5 format=3 uid="uid://u7lffbn7k044"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_efo8o"]
+size = Vector3(0.5, 2, 0.5)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_4vdxv"]
+size = Vector3(1, 2, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dttls"]
+albedo_color = Color(0.956863, 0, 0, 1)
+
+[sub_resource type="PrismMesh" id="PrismMesh_wtrpq"]
+material = SubResource("StandardMaterial3D_dttls")
+size = Vector3(0.2, 0.2, 0.2)
+
+[node name="Player3D" type="Player3D"]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+mesh = SubResource("BoxMesh_efo8o")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("BoxShape3D_4vdxv")
+
+[node name="Head" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
+
+[node name="Camera3D" type="Camera3D" parent="Head"]
+
+[node name="Dir" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, -0.548862)
+mesh = SubResource("PrismMesh_wtrpq")

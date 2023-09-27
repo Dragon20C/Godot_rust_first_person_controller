@@ -1,0 +1,45 @@
+[gd_scene load_steps=8 format=3 uid="uid://dllpl5a2bg8oc"]
+
+[ext_resource type="PackedScene" uid="uid://u7lffbn7k044" path="res://player_3d.tscn" id="1_rckks"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_jd0bi"]
+sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
+ground_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
+
+[sub_resource type="Sky" id="Sky_2df7h"]
+sky_material = SubResource("ProceduralSkyMaterial_jd0bi")
+
+[sub_resource type="Environment" id="Environment_c2fk5"]
+background_mode = 2
+sky = SubResource("Sky_2df7h")
+tonemap_mode = 2
+glow_enabled = true
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7weda"]
+albedo_color = Color(0.235294, 0.666667, 1, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_iovjy"]
+material = SubResource("StandardMaterial3D_7weda")
+size = Vector3(30, 0.2, 30)
+
+[sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_u8sg5"]
+data = PackedVector3Array(-15, 0.1, 15, 15, 0.1, 15, -15, -0.1, 15, 15, 0.1, 15, 15, -0.1, 15, -15, -0.1, 15, 15, 0.1, -15, -15, 0.1, -15, 15, -0.1, -15, -15, 0.1, -15, -15, -0.1, -15, 15, -0.1, -15, 15, 0.1, 15, 15, 0.1, -15, 15, -0.1, 15, 15, 0.1, -15, 15, -0.1, -15, 15, -0.1, 15, -15, 0.1, -15, -15, 0.1, 15, -15, -0.1, -15, -15, 0.1, 15, -15, -0.1, 15, -15, -0.1, -15, 15, 0.1, 15, -15, 0.1, 15, 15, 0.1, -15, -15, 0.1, 15, -15, 0.1, -15, 15, 0.1, -15, -15, -0.1, 15, 15, -0.1, 15, -15, -0.1, -15, 15, -0.1, 15, 15, -0.1, -15, -15, -0.1, -15)
+
+[node name="3DScene" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_c2fk5")
+
+[node name="Ground" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_iovjy")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Ground"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Ground/StaticBody3D"]
+shape = SubResource("ConcavePolygonShape3D_u8sg5")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.484565, 0.874755, 0, -0.874755, 0.484565, 0, 8, 0)
+
+[node name="Player3D" parent="." instance=ExtResource("1_rckks")]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0.1, 0)
