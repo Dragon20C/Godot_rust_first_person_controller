@@ -5,6 +5,8 @@ use godot::engine::InputEventMouseMotion;
 use godot::engine::InputEvent;
 use godot::engine::CharacterBody3D;
 use godot::engine::CharacterBody3DVirtual;
+use godot::prelude::utilities::sin;
+use godot::prelude::utilities::cos;
 
 #[derive(GodotClass)]
 #[class(base=CharacterBody3D)]
@@ -18,10 +20,30 @@ struct Player3D{
     sprint_speed: f32,
     jump_force: f32,
     gravity: f32,
+    //headbob variables
+    bob_freq: f64, // float = 2.4
+    bob_amp: f64, // 0.05
+    t_bob: f64, 
     camera_node : Option<Gd<Camera3D>>,
     #[base]
     character: Base<CharacterBody3D>
+
+    
 }
+#[godot_api]
+impl Player3D{
+    #[func]
+    fn apply_headbob(&mut self, time : f64) -> Vector3{
+        let mut pos = Vector3::ZERO;
+        let pos_x: f64 = sin(time * self.bob_freq) * self.bob_amp;
+        let pos_y: f64 = cos(time * self.bob_freq / 2.0) * self.bob_amp;
+	    pos.x = pos_x as f32; 
+	    pos.y = pos_y as f32;
+	
+        pos
+    }
+}
+
 
 
 #[godot_api]
@@ -29,10 +51,16 @@ impl CharacterBody3DVirtual for Player3D {
     fn init(base: Base<CharacterBody3D>) -> Self {
         godot_print!("Player Loaded");
         // set variables for the player class
-        Self {motion_vec:Vector3::ZERO,air_accel:3.0,decel_speed:7.0,mouse_sens:0.0025,speed:0.0,walk_speed:5.0,sprint_speed:8.0,jump_force:4.8,camera_node:None,character:base, gravity: 9.8 }
+        Self {
+            motion_vec:Vector3::ZERO,air_accel:3.0,decel_speed:7.0,
+            mouse_sens:0.0025,speed:0.0,walk_speed:5.0,sprint_speed:8.0,
+            jump_force:4.8,camera_node:None,character:base,gravity:9.8,
+             bob_freq: 1.8, bob_amp: 0.03, t_bob: 0.0}
 
         
     }
+    
+
     fn ready(&mut self){
         // set the mouse mode to captured
         Input::singleton().set_mouse_mode(engine::input::MouseMode::MOUSE_MODE_CAPTURED);
@@ -97,7 +125,7 @@ impl CharacterBody3DVirtual for Player3D {
 
         // we get the transform.basis * our input_dir to get the direction normalized.
         let direction = (self.character.get_transform().basis * Vector3::new(inpur_dir.x,0.0,inpur_dir.y)).normalized();
-
+        
         // if the player is on floor and we are moving we apply speed else we lerp to 0.
         if self.character.is_on_floor(){
             if direction != Vector3::ZERO{
@@ -114,6 +142,16 @@ impl CharacterBody3DVirtual for Player3D {
             self.motion_vec.x = self.motion_vec.x.lerp(direction.x * self.speed, real::from_f64(delta) * self.air_accel);
             self.motion_vec.z = self.motion_vec.z.lerp(direction.z * self.speed, real::from_f64(delta) * self.air_accel);
         }
+
+        // Head bob
+        self.t_bob += delta * self.motion_vec.length().as_f64() * if self.character.is_on_floor() {1.0} else {0.0};
+        let mut transform = self.camera_node.as_ref().unwrap().get_transform();
+        transform.origin = self.apply_headbob(self.t_bob);
+        self.camera_node.as_mut().unwrap().set_transform(transform);
+        
+        //self.camera_node.unwrap().set_transform();
+	    //t_bob += delta * velocity.length() * float(is_on_floor())
+	    //camera.transform.origin = _headbob(t_bob)
 
         // then we simply apply it to the characters velocity and enable move and slide.
         self.character.set_velocity(self.motion_vec);
