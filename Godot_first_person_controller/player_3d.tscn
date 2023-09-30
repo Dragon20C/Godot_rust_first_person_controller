@@ -1,4 +1,9 @@
-[gd_scene load_steps=5 format=3 uid="uid://u7lffbn7k044"]
+[gd_scene load_steps=9 format=3 uid="uid://u7lffbn7k044"]
+
+[ext_resource type="AudioStream" uid="uid://c7c55m7tbof0e" path="res://Audio/Step_1.wav" id="1_8e488"]
+[ext_resource type="AudioStream" uid="uid://bybk4lnvhdfkt" path="res://Audio/Step_2.wav" id="2_gyalo"]
+[ext_resource type="AudioStream" uid="uid://bat56bdpkpxwj" path="res://Audio/Step_3.wav" id="3_l6483"]
+[ext_resource type="AudioStream" uid="uid://dcn73m05v2mw3" path="res://Audio/Step_4.wav" id="4_d1tsr"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_efo8o"]
 size = Vector3(0.8, 2, 0.8)
@@ -17,7 +22,6 @@ size = Vector3(0.2, 0.2, 0.2)
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
-visible = false
 mesh = SubResource("BoxMesh_efo8o")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
@@ -32,3 +36,10 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
 [node name="Dir" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, -0.548862)
 mesh = SubResource("PrismMesh_wtrpq")
+
+[node name="FootstepPlayer" type="FootstepPlayer" parent="." node_paths=PackedStringArray("ground_position", "player_node")]
+footstep_sounds = Array[AudioStream]([ExtResource("1_8e488"), ExtResource("2_gyalo"), ExtResource("3_l6483"), ExtResource("4_d1tsr")])
+ground_position = NodePath("../Ground")
+player_node = NodePath("..")
+
+[node name="Ground" type="Marker3D" parent="."]

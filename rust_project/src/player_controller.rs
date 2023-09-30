@@ -26,12 +26,16 @@ struct Player3D{
     t_bob: f64, 
     camera_node : Option<Gd<Camera3D>>,
     #[base]
-    character: Base<CharacterBody3D>
+    character: Base<CharacterBody3D>,
+    footstep_played: bool
 
     
 }
 #[godot_api]
 impl Player3D{
+    #[signal]
+    fn stepped();
+
     #[func]
     fn apply_headbob(&mut self, time : f64) -> Vector3{
         let mut pos = Vector3::ZERO;
@@ -39,7 +43,17 @@ impl Player3D{
         let pos_y: f64 = cos(time * self.bob_freq / 2.0) * self.bob_amp;
 	    pos.x = pos_x as f32; 
 	    pos.y = pos_y as f32;
-	
+        
+        if pos.y > 0.0{
+            self.footstep_played = false
+        }
+        //godot_print!("Pos_y {}",pos.y);
+       
+        //# we turn sound_played to true to avoid spamming the signal
+        if pos.y < 0.0 && !self.footstep_played{
+            self.character.emit_signal("stepped".into(), &[]);
+            self.footstep_played = true
+        }
         pos
     }
 }
@@ -55,7 +69,7 @@ impl CharacterBody3DVirtual for Player3D {
             motion_vec:Vector3::ZERO,air_accel:3.0,decel_speed:7.0,
             mouse_sens:0.0025,speed:0.0,walk_speed:5.0,sprint_speed:8.0,
             jump_force:4.8,camera_node:None,character:base,gravity:9.8,
-             bob_freq: 1.8, bob_amp: 0.03, t_bob: 0.0}
+             bob_freq: 3.1, bob_amp: 0.01, t_bob: 0.0, footstep_played: false}
 
         
     }
